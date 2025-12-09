@@ -16,6 +16,8 @@
       position:relative;
       overflow:hidden;
     }
+
+    /* Zwei übereinandergelegte Bilder für Crossfade */
     .slide {
       position:absolute;
       top:50%;
@@ -34,11 +36,13 @@
       -webkit-user-drag: none;
     }
     .slide.visible { opacity:1; z-index:2; }
+
     .info{ position:fixed; bottom:8px; left:8px; color:#fff; opacity:0.9; font-size:12px; }
   </style>
 </head>
 <body>
   <div class="container" aria-live="polite">
+    <!-- Dateinamen: dienstplan.png und belegungsplan.png (optional dienstplan@2x.png / belegungsplan@2x.png für Retina) -->
     <img id="slide0" class="slide visible"
          src="dienstplan.png"
          srcset="dienstplan.png 1x, dienstplan@2x.png 2x"
@@ -53,32 +57,45 @@
 
   <script>
     (function(){
+      // Dauer pro Bild: index 0 = dienstplan (35s), index 1 = belegungsplan (20s)
       const DURATIONS = [35000, 20000];
       const slides = [document.getElementById('slide0'), document.getElementById('slide1')];
       const status = document.getElementById('status');
       let idx = 0;
+      const count = slides.length;
       let timerId = null;
 
+      // Preload (inkl. optionaler @2x Varianten)
       slides.forEach(imgEl => {
         const src = imgEl.getAttribute('src');
+        const src2 = src.replace(/\.png$/i, '@2x.png');
         const p = new Image(); p.src = src;
-        const p2 = new Image(); p2.src = src.replace(/\.png$/i, '@2x.png');
+        const p2 = new Image(); p2.src = src2;
       });
 
       function show(i) {
+        // Sichtbarkeit setzen (Crossfade per CSS)
         slides.forEach((el, j) => el.classList.toggle('visible', j === i));
+
+        // Statusanzeige
         const label = i === 0 ? 'Dienstplan' : 'Belegungsplan';
         status.textContent = `Angezeigt: ${label} — ${DURATIONS[i] / 1000}s`;
+
+        // Debuglog (natürliche Größe)
         console.log('Anzeige:', label, 'natural:', slides[i].naturalWidth, 'x', slides[i].naturalHeight);
+
+        // Nächsten Wechsel planen
         clearTimeout(timerId);
         timerId = setTimeout(() => {
-          idx = (i + 1) % slides.length;
+          idx = (i + 1) % count;
           show(idx);
         }, DURATIONS[i]);
       }
 
+      // Start mit Dienstplan (35s)
       show(0);
 
+      // Optional: Leegtaste pausiert/wiedereinschaltet den Wechsel (einfacher Toggle)
       let running = true;
       window.addEventListener('keydown', e => {
         if (e.code === 'Space') {
@@ -87,10 +104,13 @@
           if (!running) {
             clearTimeout(timerId);
             status.textContent = status.textContent + ' — pausiert';
+            console.log('Slideshow pausiert');
           } else {
+            // Beim Fortsetzen starten wir das jeweils aktuell sichtbare Bild neu (voller Zeitraum)
             const current = slides.findIndex(s => s.classList.contains('visible'));
             idx = current >= 0 ? current : 0;
             show(idx);
+            console.log('Slideshow fortgesetzt');
           }
         }
       });
