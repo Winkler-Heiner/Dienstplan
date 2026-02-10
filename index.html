@@ -47,15 +47,11 @@
       { src: "dienstplan2.png", duration: 15000 },
     ];
 
-    // Komplettes Neuladen der Seite als zusätzliche Absicherung (ms)
-    // Setze z.B. auf 0, wenn du das nicht willst.
-    const PAGE_RELOAD_MS = 10 * 60 * 1000; // alle 10 Minuten
-
     let index = 0;
     const img = document.getElementById("planImg");
     const info = document.getElementById("infoText");
 
-    // Hängt einen Zeitstempel an, damit der Browser immer die neueste Datei lädt
+    // Cache-Buster: sorgt dafür, dass nach Upload die neueste Datei geladen wird
     function cacheBustedUrl(filename) {
       return `${filename}?v=${Date.now()}`;
     }
@@ -67,21 +63,13 @@
       img.src = cacheBustedUrl(s.src);
       info.textContent = "Ansicht: " + s.src;
 
-      // nächstes Bild vorbereiten
+      // nächstes Bild
       index = (index + 1) % slides.length;
-
       setTimeout(showNext, s.duration);
     }
 
     // Start
     showNext();
-
-    // Optional: Seite regelmäßig neu laden (hilft bei “zickigen” TV-Browsern)
-    if (PAGE_RELOAD_MS > 0) {
-      setInterval(() => {
-        location.reload();
-      }, PAGE_RELOAD_MS);
-    }
   </script>
 </body>
 </html>
