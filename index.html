@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Dienstplan</title>
   <style>
-    html,body { height:100%; margin:0; background:#000; }
+    html, body { height:100%; margin:0; background:#000; }
     .container{
       width:100%;
       height:100%;
@@ -22,15 +22,46 @@
       box-shadow:0 6px 30px rgba(0,0,0,0.6);
       display:block;
     }
-    .info{ position:fixed; bottom:8px; left:8px; color:#fff; opacity:0.8; font-size:12px; }
+    .info{
+      position:fixed;
+      bottom:8px;
+      left:8px;
+      color:#fff;
+      opacity:0.8;
+      font-size:12px;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <!-- Dateiname: dienstplan.png (muss im Repo liegen) -->
-    <img src="dienstplan.png" alt="Dienstplan" class="dienstplan-img" />
+    <img id="planImg" src="dienstplan.png" alt="Dienstplan" class="dienstplan-img" />
   </div>
-  <div class="info">Ansicht: Dienstplan</div>
+  <div class="info" id="infoText">Ansicht: dienstplan.png</div>
+
+  <script>
+    // Reihenfolge + Anzeigezeiten (ms)
+    const slides = [
+      { src: "dienstplan.png",  duration: 45000 },
+      { src: "dienstplan1.png", duration: 15000 },
+      { src: "dienstplan2.png", duration: 15000 },
+    ];
+
+    let index = 0;
+    const img = document.getElementById("planImg");
+    const info = document.getElementById("infoText");
+
+    function showNext() {
+      const s = slides[index];
+      img.src = s.src;
+      info.textContent = "Ansicht: " + s.src;
+
+      index = (index + 1) % slides.length;
+      setTimeout(showNext, s.duration);
+    }
+
+    // Start
+    showNext();
+  </script>
 </body>
 </html>
-
