@@ -40,28 +40,48 @@
   <div class="info" id="infoText">Ansicht: dienstplan.png</div>
 
   <script>
-    // Reihenfolge + Anzeigezeiten (ms)
+    // Dateien + Anzeigezeiten (ms)
     const slides = [
       { src: "dienstplan.png",  duration: 45000 },
       { src: "dienstplan1.png", duration: 15000 },
       { src: "dienstplan2.png", duration: 15000 },
     ];
 
+    // Komplettes Neuladen der Seite als zusätzliche Absicherung (ms)
+    // Setze z.B. auf 0, wenn du das nicht willst.
+    const PAGE_RELOAD_MS = 10 * 60 * 1000; // alle 10 Minuten
+
     let index = 0;
     const img = document.getElementById("planImg");
     const info = document.getElementById("infoText");
 
+    // Hängt einen Zeitstempel an, damit der Browser immer die neueste Datei lädt
+    function cacheBustedUrl(filename) {
+      return `${filename}?v=${Date.now()}`;
+    }
+
     function showNext() {
       const s = slides[index];
-      img.src = s.src;
+
+      // Bild neu laden (Cache umgehen)
+      img.src = cacheBustedUrl(s.src);
       info.textContent = "Ansicht: " + s.src;
 
+      // nächstes Bild vorbereiten
       index = (index + 1) % slides.length;
+
       setTimeout(showNext, s.duration);
     }
 
     // Start
     showNext();
+
+    // Optional: Seite regelmäßig neu laden (hilft bei “zickigen” TV-Browsern)
+    if (PAGE_RELOAD_MS > 0) {
+      setInterval(() => {
+        location.reload();
+      }, PAGE_RELOAD_MS);
+    }
   </script>
 </body>
 </html>
